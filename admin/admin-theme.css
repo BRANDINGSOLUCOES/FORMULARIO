@@ -1,0 +1,87 @@
+/* admin/admin-theme.css
+   Design system compartilhado por TODAS as páginas do painel administrativo
+   (login.html, dashboard.html, company.html). Qualquer ajuste visual feito
+   aqui (cor, raio de borda, espaçamento) reflete nas três telas de uma vez —
+   é a base dos "componentes reutilizáveis" pedidos na Etapa 8.
+*/
+:root{
+  --navy-900:#062B45; --navy-800:#0B3A5C; --navy-700:#134266;
+  --sky-400:#7DB0E3; --sky-300:#9AC3EA; --sky-100:#EAF3FC; --sky-50:#F7FBFF;
+  --slate-600:#5B6B7A; --border-soft:#E4EDF6;
+  --gold-500:#C9A227; --gold-400:#E4C158; --gold-600:#A9841D;
+  --danger:#B3261E; --danger-bg:#FDECEC; --success:#1E8E5A; --success-bg:#E7F6EF;
+}
+body{ font-family:'Inter',system-ui,sans-serif; color:var(--navy-900); background:var(--sky-50); }
+h1,h2,h3,.display{ font-family:'Manrope',system-ui,sans-serif; }
+
+/* Layout */
+.topbar{ background:var(--navy-900); }
+.card{ background:#fff; border:1px solid var(--border-soft); border-radius:20px; }
+.stat-card{ padding:1.25rem 1.5rem; }
+.stat-number{ font-family:'Manrope',sans-serif; font-weight:800; font-size:1.9rem; color:var(--navy-900); line-height:1; }
+.stat-label{ font-size:0.8rem; color:var(--slate-600); font-weight:600; margin-top:0.35rem; }
+
+/* Form fields */
+.field-input{
+  border:1.5px solid var(--border-soft); border-radius:12px; padding:0.6rem 0.9rem;
+  font-size:0.875rem; color:var(--navy-900); background:#fff; min-height:42px;
+}
+.field-input:focus{ border-color:var(--sky-400); box-shadow:0 0 0 3px rgba(125,176,227,0.2); outline:none; }
+.field-input-lg{ min-height:52px; padding:0.8rem 1rem; font-size:0.975rem; border-radius:14px; }
+
+/* Status badges */
+.badge{ display:inline-flex; align-items:center; gap:0.3rem; padding:0.25rem 0.65rem; border-radius:999px; font-size:0.75rem; font-weight:700; }
+.badge-enviado{ background:var(--success-bg); color:var(--success); }
+.badge-pendente{ background:var(--sky-100); color:var(--navy-800); }
+.badge-erro{ background:var(--danger-bg); color:var(--danger); }
+.badge-sem{ background:#F1F3F5; color:var(--slate-600); }
+
+/* Table */
+table{ border-collapse:collapse; width:100%; }
+th{ text-align:left; font-size:0.75rem; text-transform:uppercase; letter-spacing:0.03em; color:var(--slate-600); font-weight:700; padding:0.75rem 1rem; border-bottom:1.5px solid var(--border-soft); white-space:nowrap; }
+td{ padding:0.85rem 1rem; font-size:0.875rem; color:var(--navy-900); border-bottom:1px solid var(--border-soft); white-space:nowrap; }
+tr:last-child td{ border-bottom:none; }
+tr:hover td{ background:var(--sky-50); }
+
+/* Buttons */
+.btn-ghost{ border:1.5px solid var(--border-soft); border-radius:10px; padding:0.5rem 0.9rem; font-size:0.825rem; font-weight:600; background:#fff; color:var(--navy-900); transition:all .15s ease; cursor:pointer; }
+.btn-ghost:hover{ border-color:var(--sky-400); background:var(--sky-50); }
+.btn-ghost:disabled{ opacity:0.45; cursor:not-allowed; }
+
+.btn-gold{
+  background:linear-gradient(135deg, var(--gold-400), var(--gold-500)); color:var(--navy-900);
+  border-radius:14px; font-weight:700; padding:0.7rem 1.25rem; min-height:44px;
+  transition:all .2s ease; box-shadow:0 8px 20px -10px rgba(201,162,39,0.65);
+  border:none; cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; justify-content:center;
+}
+.btn-gold:hover{ background:linear-gradient(135deg, var(--gold-500), var(--gold-600)); color:#fff; }
+.btn-gold:disabled{ opacity:0.55; cursor:not-allowed; }
+
+.btn-danger{
+  background:#fff; color:var(--danger); border:1.5px solid #F3C6C3; border-radius:14px;
+  font-weight:700; padding:0.7rem 1.25rem; min-height:44px; transition:all .2s ease;
+  cursor:pointer; display:inline-flex; align-items:center; gap:0.4rem; justify-content:center;
+}
+.btn-danger:hover{ background:var(--danger-bg); border-color:var(--danger); }
+.btn-danger:disabled{ opacity:0.55; cursor:not-allowed; }
+
+/* Bar charts (empresas por segmento / por mês) */
+.bar-row{ display:flex; align-items:center; gap:0.75rem; }
+.bar-label{ width:120px; font-size:0.8rem; color:var(--navy-900); font-weight:600; flex-shrink:0; }
+.bar-track{ flex:1; height:10px; border-radius:999px; background:var(--sky-100); overflow:hidden; }
+.bar-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg, var(--navy-900), var(--sky-400)); }
+.bar-value{ width:32px; text-align:right; font-size:0.8rem; font-weight:700; color:var(--navy-900); flex-shrink:0; }
+
+/* Loading skeleton */
+.skeleton{ background:linear-gradient(90deg, var(--sky-100) 25%, var(--sky-50) 37%, var(--sky-100) 63%); background-size:400% 100%; animation:skeleton-loading 1.4s ease infinite; border-radius:8px; }
+@keyframes skeleton-loading{ 0%{background-position:100% 50%;} 100%{background-position:0 50%;} }
+
+/* Info rows (usados na página de detalhes da empresa) */
+.info-row{ display:flex; justify-content:space-between; gap:1rem; padding:0.65rem 0; border-bottom:1px solid var(--border-soft); font-size:0.9rem; }
+.info-row:last-child{ border-bottom:none; }
+.info-row .info-label{ color:var(--slate-600); font-weight:600; }
+.info-row .info-value{ color:var(--navy-900); text-align:right; }
+
+/* Modal (confirmação de exclusão) */
+.modal-backdrop{ position:fixed; inset:0; background:rgba(6,43,69,0.55); display:flex; align-items:center; justify-content:center; z-index:50; padding:1.25rem; }
+.modal-card{ background:#fff; border-radius:20px; padding:1.75rem; max-width:380px; width:100%; }

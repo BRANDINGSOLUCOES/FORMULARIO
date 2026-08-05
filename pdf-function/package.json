@@ -1,0 +1,19 @@
+{
+  "name": "diagnostico-pdf-function",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Geração de PDF do relatório de diagnóstico (Puppeteer + Supabase Storage) e acionamento das Edge Functions de WhatsApp/e-mail. Precisa rodar em ambiente Node.js (Vercel Serverless 'nodejs' runtime, Cloud Run, Railway, etc.) — não é compatível com Deno/Edge Functions.",
+  "main": "generatePdfCore.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sparticuz/chromium": "^123.0.0",
+    "puppeteer-core": "^22.0.0",
+    "@supabase/supabase-js": "^2.43.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.0",
+    "@types/node": "^20.11.0"
+  }
+}
