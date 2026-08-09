@@ -1,9 +1,19 @@
 // pdf-function/services/pdfRenderer.ts
 //
 // Renderização do relatório HTML em PDF via Puppeteer + Chromium
-// serverless (@sparticuz/chromium). Continua sendo o único motivo pelo
-// qual este módulo precisa rodar em Node.js (Deno Deploy não permite
-// abrir um binário de Chromium).
+// serverless. Continua sendo o único motivo pelo qual este módulo
+// precisa rodar em Node.js (Deno Deploy não permite abrir um binário
+// de Chromium).
+//
+// ⚠️ Usa @sparticuz/chromium-min (não a versão completa @sparticuz/chromium)
+// porque a versão completa embute o binário do Chromium (~130MB) dentro
+// da função — isso estoura o limite de tamanho de função da Vercel
+// (50MB comprimido), fazendo arquivos internos (como libnss3.so) serem
+// descartados silenciosamente no deploy, quebrando o Chromium em tempo
+// de execução com "error while loading shared libraries: libnss3.so".
+// A versão "-min" busca o pacote do Chromium de uma URL externa na
+// primeira execução (fica em cache no /tmp entre execuções "quentes"),
+// mantendo o tamanho da função dentro do limite.
 //
 // Otimização de performance (Etapa 9): em execuções "quentes" de uma
 // função serverless (a mesma instância atendendo requisições seguidas),
@@ -12,8 +22,16 @@
 // enquanto a instância continuar viva — sem efeito colateral, porque
 // cada renderização usa uma aba (`page`) nova e a fecha ao final.
 
-import chromium from '@sparticuz/chromium';
+import chromium from '@sparticuz/chromium-min';
 import puppeteer, { Browser } from 'puppeteer-core';
+
+// Pacote oficial do Chromium hospedado pelo próprio mantenedor do
+// @sparticuz/chromium — a versão no nome do arquivo precisa bater com a
+// versão do pacote em package.json (ver CHROMIUM_PACK_VERSION abaixo).
+const CHROMIUM_PACK_VERSION = '123.0.1';
+const REMOTE_CHROMIUM_URL =
+  process.env.CHROMIUM_REMOTE_PACK_URL ||
+  `https://github.com/Sparticuz/chromium/releases/download/v${CHROMIUM_PACK_VERSION}/chromium-v${CHROMIUM_PACK_VERSION}-pack.tar`;
 
 let cachedBrowser: Browser | null = null;
 
@@ -24,7 +42,7 @@ async function getBrowser(): Promise<Browser> {
   cachedBrowser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: chromium.defaultViewport,
-    executablePath: await chromium.executablePath(),
+    executablePath: await chromium.executablePath(REMOTE_CHROMIUM_URL),
     headless: chromium.headless,
   });
   return cachedBrowser;
