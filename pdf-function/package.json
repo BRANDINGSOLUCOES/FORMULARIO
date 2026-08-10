@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@sparticuz/chromium-min": "133.0.0",
-    "puppeteer-core": "^25.5.0",
+    "puppeteer-core": "24.43.1",
     "@supabase/supabase-js": "^2.43.0"
   },
   "devDependencies": {
