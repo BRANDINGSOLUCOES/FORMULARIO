@@ -28,7 +28,7 @@ import puppeteer, { Browser } from 'puppeteer-core';
 // Pacote oficial do Chromium hospedado pelo próprio mantenedor do
 // @sparticuz/chromium — a versão no nome do arquivo precisa bater com a
 // versão do pacote em package.json (ver CHROMIUM_PACK_VERSION abaixo).
-const CHROMIUM_PACK_VERSION = '123.0.1';
+const CHROMIUM_PACK_VERSION = '149.0.0';
 const REMOTE_CHROMIUM_URL =
   process.env.CHROMIUM_REMOTE_PACK_URL ||
   `https://github.com/Sparticuz/chromium/releases/download/v${CHROMIUM_PACK_VERSION}/chromium-v${CHROMIUM_PACK_VERSION}-pack.tar`;
@@ -41,9 +41,9 @@ async function getBrowser(): Promise<Browser> {
   }
   cachedBrowser = await puppeteer.launch({
     args: chromium.args,
-    defaultViewport: chromium.defaultViewport,
+    defaultViewport: { width: 1240, height: 1754 }, // proporção A4 em pixels (96dpi)
     executablePath: await chromium.executablePath(REMOTE_CHROMIUM_URL),
-    headless: chromium.headless,
+    headless: true,
   });
   return cachedBrowser;
 }
@@ -53,10 +53,12 @@ export async function renderHtmlToPdf(html: string): Promise<Buffer> {
   const page = await browser.newPage();
 
   try {
-    // O relatório é autocontido (CSS e logo embutidos em base64), então
-    // não depende de nada externo além das fontes do Google Fonts — por
-    // isso esperamos a rede ficar ociosa antes de gerar o PDF.
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    // 'setContent()' só aceita 'load' | 'domcontentloaded' — usamos 'load'
+    // para dar tempo do CSS ser aplicado, e esperamos explicitamente as
+    // fontes do Google Fonts terminarem de carregar (o evento 'load'
+    // sozinho não garante isso).
+    await page.setContent(html, { waitUntil: 'load' });
+    await page.evaluateHandle('document.fonts.ready');
     const pdfBuffer = await page.pdf({
       format: 'A4',
       printBackground: true,
