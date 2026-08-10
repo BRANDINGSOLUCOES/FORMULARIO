@@ -22,30 +22,21 @@
 // enquanto a instância continuar viva — sem efeito colateral, porque
 // cada renderização usa uma aba (`page`) nova e a fecha ao final.
 
-// ⚠️ Import dinâmico de propósito: a partir de certa versão,
-// @sparticuz/chromium-min passou a ser distribuído como ES Module puro.
-// Este projeto compila para CommonJS (ver tsconfig.json), e `require()`
-// não consegue carregar um ES Module diretamente — isso quebrava em
-// produção com "Error [ERR_REQUIRE_ESM]". `import()` dinâmico funciona
-// dentro de CommonJS como uma forma de interoperabilidade suportada
-// nativamente pelo Node.js.
+import chromium from '@sparticuz/chromium-min';
 import puppeteer, { Browser } from 'puppeteer-core';
-
-type ChromiumModule = typeof import('@sparticuz/chromium-min');
-let chromiumModule: ChromiumModule['default'] | null = null;
-
-async function getChromium() {
-  if (!chromiumModule) {
-    const mod: ChromiumModule = await import('@sparticuz/chromium-min');
-    chromiumModule = mod.default;
-  }
-  return chromiumModule;
-}
 
 // Pacote oficial do Chromium hospedado pelo próprio mantenedor do
 // @sparticuz/chromium — a versão no nome do arquivo precisa bater com a
 // versão do pacote em package.json (ver CHROMIUM_PACK_VERSION abaixo).
-const CHROMIUM_PACK_VERSION = '149.0.0';
+//
+// ⚠️ Fixado em 133.0.0 de propósito: é a última versão do pacote ainda
+// distribuída como CommonJS. A partir da 137.0.0, o pacote passou a ser
+// ES Module puro — o build da Vercel para este projeto usa seu próprio
+// bundler interno (não respeita nosso tsconfig.json, que tem
+// `noEmit: true` e só serve para checagem de tipos localmente), que
+// converte `import()` dinâmico de volta para `require()`, quebrando com
+// "Error [ERR_REQUIRE_ESM]" em qualquer versão ESM-only do pacote.
+const CHROMIUM_PACK_VERSION = '133.0.0';
 const REMOTE_CHROMIUM_URL =
   process.env.CHROMIUM_REMOTE_PACK_URL ||
   `https://github.com/Sparticuz/chromium/releases/download/v${CHROMIUM_PACK_VERSION}/chromium-v${CHROMIUM_PACK_VERSION}-pack.tar`;
@@ -56,7 +47,6 @@ async function getBrowser(): Promise<Browser> {
   if (cachedBrowser && cachedBrowser.connected) {
     return cachedBrowser;
   }
-  const chromium = await getChromium();
   cachedBrowser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: { width: 1240, height: 1754 }, // proporção A4 em pixels (96dpi)
