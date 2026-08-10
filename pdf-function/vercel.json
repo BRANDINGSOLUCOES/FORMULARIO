@@ -1,10 +1,12 @@
 {
   "functions": {
     "api/full-pipeline.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 3009
     },
     "api/generate-pdf.ts": {
-      "maxDuration": 60
+      "maxDuration": 60,
+      "memory": 3009
     }
   }
 }
