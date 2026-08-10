@@ -22,8 +22,25 @@
 // enquanto a instância continuar viva — sem efeito colateral, porque
 // cada renderização usa uma aba (`page`) nova e a fecha ao final.
 
-import chromium from '@sparticuz/chromium-min';
+// ⚠️ Import dinâmico de propósito: a partir de certa versão,
+// @sparticuz/chromium-min passou a ser distribuído como ES Module puro.
+// Este projeto compila para CommonJS (ver tsconfig.json), e `require()`
+// não consegue carregar um ES Module diretamente — isso quebrava em
+// produção com "Error [ERR_REQUIRE_ESM]". `import()` dinâmico funciona
+// dentro de CommonJS como uma forma de interoperabilidade suportada
+// nativamente pelo Node.js.
 import puppeteer, { Browser } from 'puppeteer-core';
+
+type ChromiumModule = typeof import('@sparticuz/chromium-min');
+let chromiumModule: ChromiumModule['default'] | null = null;
+
+async function getChromium() {
+  if (!chromiumModule) {
+    const mod: ChromiumModule = await import('@sparticuz/chromium-min');
+    chromiumModule = mod.default;
+  }
+  return chromiumModule;
+}
 
 // Pacote oficial do Chromium hospedado pelo próprio mantenedor do
 // @sparticuz/chromium — a versão no nome do arquivo precisa bater com a
@@ -39,6 +56,7 @@ async function getBrowser(): Promise<Browser> {
   if (cachedBrowser && cachedBrowser.connected) {
     return cachedBrowser;
   }
+  const chromium = await getChromium();
   cachedBrowser = await puppeteer.launch({
     args: chromium.args,
     defaultViewport: { width: 1240, height: 1754 }, // proporção A4 em pixels (96dpi)
